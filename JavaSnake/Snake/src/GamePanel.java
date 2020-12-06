@@ -12,14 +12,12 @@ public class GamePanel extends JPanel implements ActionListener{
 	static final int GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/UNIT_SIZE;
 	static final int DELAY = 75;
 	Snake snake;
-	int[] snakeX;
-	int[] snakeY;
-	Apple apple;
+	Board board;
 	boolean running = false;
 	boolean gameOver = true;
 	Timer timer;
-	char direction;
 	int highScore = 0;
+	int currentScore = 0;
 
 	GamePanel(){
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH,TOTAL_HEIGHT));
@@ -31,14 +29,8 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 
 	public void startGame(){
-		direction = 'R';
-		snake = new BabySnake();
-		snakeX = snake.getX();
-		snakeY = snake.getY();
-
 		gameOver = false;
-		apple = new Apple();
-		apple.resetApple();
+		board = new Board();
 		running = true;
 		timer = new Timer(DELAY, this);
 		timer.start();
@@ -64,91 +56,36 @@ public class GamePanel extends JPanel implements ActionListener{
 
 			// draws apple
 			g.setColor(Color.red);
-			g.fillOval(apple.getAppleX(), apple.getAppleY(), UNIT_SIZE, UNIT_SIZE);
+			g.fillOval(board.getAppleX(), board.getAppleY(), UNIT_SIZE, UNIT_SIZE);
 
 			// draw snake
-			for(int i = 0; i < snake.getBodyParts(); i++){
+			for(int i = 0; i < board.getSnakeBodyParts(); i++){
 				// snake head
 				if(i == 0){
 					g.setColor(Color.green);
-					g.fillRect(snakeX[i], snakeY[i], UNIT_SIZE, UNIT_SIZE);
+					g.fillRect(board.getSnakeX()[i], board.getSnakeY()[i], UNIT_SIZE, UNIT_SIZE);
 				}
 				// snake body
 				else{
 					g.setColor(new Color(45, 180, 0));
-					g.fillRect(snakeX[i], snakeY[i], UNIT_SIZE, UNIT_SIZE);
+					g.fillRect(board.getSnakeX()[i], board.getSnakeY()[i], UNIT_SIZE, UNIT_SIZE);
 				}
 			}
 
 			g.setColor(Color.white);
 			g.setFont(new Font("Courier",Font.PLAIN, 40));
 			FontMetrics metrics = getFontMetrics(g.getFont());
-			g.drawString("Score: "+snake.getApplesEaten(), (SCREEN_WIDTH - metrics.stringWidth("Score: "+snake.getApplesEaten()))/2, g.getFont().getSize()+20);
+			g.drawString("Score: "+board.getScore(), (SCREEN_WIDTH - metrics.stringWidth("Score: "+board.getScore()))/2, g.getFont().getSize()+20);
 		}
 		else {
 			gameOver(g);
 		}
 	}
 
-	public void move(){
-		for(int i = snake.getBodyParts(); i > 0; i--){
-			snakeX[i] = snakeX[i-1];
-			snakeY[i] = snakeY[i-1];
-		}
-
-		switch(direction){
-			case 'U':
-				snakeY[0] = snakeY[0] - UNIT_SIZE;
-				break;
-			case 'D':
-				snakeY[0] = snakeY[0] + UNIT_SIZE;
-				break;
-			case 'L':
-				snakeX[0] = snakeX[0] - UNIT_SIZE;
-				break;
-			case 'R':
-				snakeX[0] = snakeX[0] + UNIT_SIZE;
-				break;
-		}
-	}
-
-	public void checkApple(){
-		if((snakeX[0] == apple.getAppleX() && snakeY[0] == apple.getAppleY())){
-			snake = new GrowSnake(snake);
-			apple.resetApple();
-		}
-	}
-
 	public void checkCollisions(){
-		// checks if head collides with body
-		for(int i = snake.getBodyParts(); i > 0; i--){
-			if((snakeX[0] == snakeX[i]) && (snakeY[0] == snakeY[i])){
-				running = false;
-				gameOver = true;
-			}
-		}
-		// checks if head touches left border
-		if(snakeX[0] < 0){
+		if (board.didSnakeCollide()) {
 			running = false;
 			gameOver = true;
-		}
-		// checks if head touches right border
-		if(snakeX[0] > SCREEN_WIDTH){
-			running = false;
-			gameOver = true;
-		}
-		// checks if head touches top border
-		if(snakeY[0] < SCORE_HEIGHT){
-			running = false;
-			gameOver = true;
-		}
-		// checks if head touches bottom border
-		if(snakeY[0] > TOTAL_HEIGHT){
-			running = false;
-			gameOver = true;
-		}
-
-		if(!running){
 			timer.stop();
 		}
 	}
@@ -156,7 +93,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	public void gameOver(Graphics g){
 		gameOver = true;
 
-		int currentScore = snake.getApplesEaten();
+		int currentScore = board.getScore();
 
 		if (currentScore > highScore) {
 			highScore = currentScore;
@@ -191,8 +128,8 @@ public class GamePanel extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e){
 
 		if(running && !gameOver){
-			move();
-			checkApple();
+			board.moveSnake();
+			board.checkApple();
 			checkCollisions();
 		}
 		repaint();
@@ -202,30 +139,30 @@ public class GamePanel extends JPanel implements ActionListener{
 		@Override
 		public void keyPressed(KeyEvent e){
 			switch(e.getKeyCode()){
-				case KeyEvent.VK_LEFT:
-					if(direction != 'R'){
-						direction = 'L';
-					}
-					break;
-				case KeyEvent.VK_RIGHT:
-					if(direction != 'L'){
-						direction = 'R';
-					}
-					break;
-				case KeyEvent.VK_UP:
-					if(direction != 'D'){
-						direction = 'U';
-					}
-					break;
-				case KeyEvent.VK_DOWN:
-					if(direction != 'U'){
-						direction = 'D';
-					}
-					break;
-				case KeyEvent.VK_R:
-					if(gameOver){
-						startGame();
-					}
+			case KeyEvent.VK_LEFT:
+				if(board.getSnakeDirection() != Direction.RIGHT){
+					board.setSnakeDirection(Direction.LEFT);
+				}
+				break;
+			case KeyEvent.VK_RIGHT:
+				if(board.getSnakeDirection()  != Direction.LEFT){
+					board.setSnakeDirection(Direction.RIGHT);
+				}
+				break;
+			case KeyEvent.VK_UP:
+				if(board.getSnakeDirection()  != Direction.DOWN){
+					board.setSnakeDirection(Direction.UP);
+				}
+				break;
+			case KeyEvent.VK_DOWN:
+				if(board.getSnakeDirection()  != Direction.UP){
+					board.setSnakeDirection(Direction.DOWN);
+				}
+				break;
+			case KeyEvent.VK_R:
+				if(gameOver){
+					startGame();
+				}
 			}
 		}
 	}
