@@ -6,7 +6,7 @@ Run the Java Application to launch a Snake game session. The snake is controlled
 
 How to play:
 1. Create Java project
-2. Import all .java files into Java project
+2. Import all .java files from "CS151-Team1/JavaSnake/Snake/src/" into Java project
 3. Run SnakeGame.java as Java Application
 
 
