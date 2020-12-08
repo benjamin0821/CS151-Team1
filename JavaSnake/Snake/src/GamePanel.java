@@ -9,7 +9,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	static final int SCORE_HEIGHT = 100;
 	static final int TOTAL_HEIGHT = SCREEN_HEIGHT + SCORE_HEIGHT;
 	static final int UNIT_SIZE = 25;
-	static final int GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/UNIT_SIZE;
+	static final int GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/(UNIT_SIZE*UNIT_SIZE);
 	static final int DELAY = 75;
 	Snake snake;
 	Board board;
@@ -105,18 +105,27 @@ public class GamePanel extends JPanel implements ActionListener{
 		FontMetrics metrics0 = getFontMetrics(g.getFont());
 		g.drawString("High Score: " + highScore, (SCREEN_WIDTH - metrics0.stringWidth("High Score: " + highScore))/2, g.getFont().getSize()+TOTAL_HEIGHT/4);
 
-		// Game Over text
-		g.setColor(Color.red);
-		g.setFont(new Font("Impact",Font.PLAIN, 75));
-		FontMetrics metrics1 = getFontMetrics(g.getFont());
-		g.drawString("GAME OVER", (SCREEN_WIDTH - metrics1.stringWidth("GAME OVER"))/2, TOTAL_HEIGHT/2);
-
+		if (currentScore == GAME_UNITS){
+			// Winning text
+			g.setColor(Color.green);
+			g.setFont(new Font("Impact",Font.PLAIN, 75));
+			FontMetrics metrics1 = getFontMetrics(g.getFont());
+			g.drawString("YOU WIN", (SCREEN_WIDTH - metrics1.stringWidth("YOU WIN"))/2, TOTAL_HEIGHT/2);
+		}else {
+			// Game Over text
+			g.setColor(Color.red);
+			g.setFont(new Font("Impact",Font.PLAIN, 75));
+			FontMetrics metrics1 = getFontMetrics(g.getFont());
+			g.drawString("GAME OVER", (SCREEN_WIDTH - metrics1.stringWidth("GAME OVER"))/2, TOTAL_HEIGHT/2);
+		}
+		
 		// Score text
 		g.setColor(Color.white);
 		g.setFont(new Font("Courier",Font.PLAIN, 40));
 		FontMetrics metrics2 = getFontMetrics(g.getFont());
 		g.drawString("Score: " + currentScore, (SCREEN_WIDTH - metrics2.stringWidth("Score: " + currentScore))/2, g.getFont().getSize()+TOTAL_HEIGHT/2);
 
+		// Replay text
 		g.setColor(Color.white);
 		g.setFont(new Font("Courier",Font.PLAIN, 25));
 		FontMetrics metrics3 = getFontMetrics(g.getFont());
