@@ -37,3 +37,8 @@ View + Controller:
 
 App: 
 - Snake Game
+
+
+How to run unit tests:
+1. Compile all files in src folder
+2. Run UnitTestRunner class: `java UnitTestRunner`
