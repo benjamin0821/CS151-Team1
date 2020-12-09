@@ -1,4 +1,4 @@
-# CS151-Team1
+# Fall 2020 CS151-Team1
 Snake game
 
 Game Description:
