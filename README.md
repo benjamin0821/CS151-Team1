@@ -17,6 +17,7 @@ Design Pattern (Decorator):
 
 Model:
 - Apple
+- Board
 - Snake
 - BabySnake
 - GrowSnake
@@ -24,6 +25,7 @@ Model:
 View + Controller:
 - Game Frame
 - Game Panel (Controller as a nested class: MyKeyAdapter)
+- Direction (Enum)
 
 App: 
 - Snake Game
