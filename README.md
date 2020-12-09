@@ -15,6 +15,9 @@ Design Pattern (Decorator):
 - BabySnake
 - GrowSnake
 
+Design Pattern (Singleton):
+- Apple
+
 Model:
 - Apple
 - Board
